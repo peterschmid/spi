@@ -1,4 +1,3 @@
-#include "mcp3008Spi.h"
 #include <string.h>
 #include <unistd.h>
 #include <stdint.h>
@@ -8,6 +7,7 @@
 #include <errno.h>
 #include <stdlib.h>
 
+#include "mcp3008Spi.h"
 
 
 using namespace std;
@@ -21,43 +21,43 @@ using namespace std;
  * *********************************************************/
 int mcp3008Spi::spiOpen(const std::string& devspi){
     int statusVal = -1;
-    this->spifd = open(devspi.c_str(), O_RDWR);
-    if(this->spifd < 0){
+    spifd = open(devspi.c_str(), O_RDWR);
+    if(spifd < 0){
         perror("could not open SPI device");
         exit(1);
     }
 
-    statusVal = ioctl (this->spifd, SPI_IOC_WR_MODE, &(this->mode));
+    statusVal = ioctl (spifd, SPI_IOC_WR_MODE, &mode);
     if(statusVal < 0){
         perror("Could not set SPIMode (WR)...ioctl fail");
         exit(1);
     }
 
-    statusVal = ioctl (this->spifd, SPI_IOC_RD_MODE, &(this->mode));
+    statusVal = ioctl (spifd, SPI_IOC_RD_MODE, &mode);
     if(statusVal < 0) {
       perror("Could not set SPIMode (RD)...ioctl fail");
       exit(1);
     }
 
-    statusVal = ioctl (this->spifd, SPI_IOC_WR_BITS_PER_WORD, &(this->bitsPerWord));
+    statusVal = ioctl (spifd, SPI_IOC_WR_BITS_PER_WORD, &bitsPerWord);
     if(statusVal < 0) {
       perror("Could not set SPI bitsPerWord (WR)...ioctl fail");
       exit(1);
     }
 
-    statusVal = ioctl (this->spifd, SPI_IOC_RD_BITS_PER_WORD, &(this->bitsPerWord));
+    statusVal = ioctl (spifd, SPI_IOC_RD_BITS_PER_WORD, &bitsPerWord);
     if(statusVal < 0) {
       perror("Could not set SPI bitsPerWord(RD)...ioctl fail");
       exit(1);
     }
 
-    statusVal = ioctl (this->spifd, SPI_IOC_WR_MAX_SPEED_HZ, &(this->speed));
+    statusVal = ioctl (spifd, SPI_IOC_WR_MAX_SPEED_HZ, &speed);
     if(statusVal < 0) {
       perror("Could not set SPI speed (WR)...ioctl fail");
       exit(1);
     }
 
-    statusVal = ioctl (this->spifd, SPI_IOC_RD_MAX_SPEED_HZ, &(this->speed));
+    statusVal = ioctl (spifd, SPI_IOC_RD_MAX_SPEED_HZ, &speed);
     if(statusVal < 0) {
       perror("Could not set SPI speed (RD)...ioctl fail");
       exit(1);
@@ -72,7 +72,7 @@ int mcp3008Spi::spiOpen(const std::string& devspi){
 
 int mcp3008Spi::spiClose(){
     int statusVal = -1;
-    statusVal = close(this->spifd);
+    statusVal = close(spifd);
         if(statusVal < 0) {
       perror("Could not close SPI device");
       exit(1);
@@ -100,12 +100,12 @@ int mcp3008Spi::spiWriteRead( unsigned char *data, int length){
     spi[i].rx_buf        = (unsigned long)(data + i) ; // receive into "data"
     spi[i].len           = sizeof(*(data + i)) ;
     spi[i].delay_usecs   = 0 ;
-    spi[i].speed_hz      = this->speed ;
-    spi[i].bits_per_word = this->bitsPerWord ;
+    spi[i].speed_hz      = speed ;
+    spi[i].bits_per_word = bitsPerWord ;
     spi[i].cs_change = 0;
 }
 
- retVal = ioctl (this->spifd, SPI_IOC_MESSAGE(length), &spi) ;
+ retVal = ioctl (spifd, SPI_IOC_MESSAGE(length), &spi) ;
 
  if(retVal < 0){
     perror("Problem transmitting spi data..ioctl");
@@ -122,12 +122,12 @@ return retVal;
  * ***********************************************/
 
 mcp3008Spi::mcp3008Spi(){
-    this->mode = SPI_MODE_0 ;
-    this->bitsPerWord = 8;
-    this->speed = 1000000;
-    this->spifd = -1;
+    mode = SPI_MODE_0 ;
+    bitsPerWord = 8;
+    speed = 1000000;
+    spifd = -1;
 
-    this->spiOpen(std::string("/dev/spidev0.0"));
+    spiOpen(std::string("/dev/spidev0.0"));
 
     }
 
@@ -136,12 +136,12 @@ mcp3008Spi::mcp3008Spi(){
  * and then call spiOpen()
  * ***********************************************/
 mcp3008Spi::mcp3008Spi(const std::string& devspi, unsigned char spiMode, unsigned int spiSpeed, unsigned char spibitsPerWord){
-    this->mode = spiMode ;
-    this->bitsPerWord = spibitsPerWord;
-    this->speed = spiSpeed;
-    this->spifd = -1;
+    mode = spiMode ;
+    bitsPerWord = spibitsPerWord;
+    speed = spiSpeed;
+    spifd = -1;
 
-    this->spiOpen(devspi);
+    spiOpen(devspi);
 
 }
 
@@ -149,5 +149,5 @@ mcp3008Spi::mcp3008Spi(const std::string& devspi, unsigned char spiMode, unsigne
  * Destructor: calls spiClose()
  * ********************************************/
 mcp3008Spi::~mcp3008Spi(){
-    this->spiClose();
+    spiClose();
 }
