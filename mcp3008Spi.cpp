@@ -1,5 +1,15 @@
 #include "mcp3008Spi.h"
 #include <string.h>
+#include <unistd.h>
+#include <stdint.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <stdio.h>
+#include <errno.h>
+#include <stdlib.h>
+
+
+
 using namespace std;
 /**********************************************************
  * spiOpen() :function is called by the constructor.
@@ -9,7 +19,7 @@ using namespace std;
  * They must be set appropriately by constructor before calling
  * this function.
  * *********************************************************/
-int mcp3008Spi::spiOpen(std::string devspi){
+int mcp3008Spi::spiOpen(const std::string& devspi){
     int statusVal = -1;
     this->spifd = open(devspi.c_str(), O_RDWR);
     if(this->spifd < 0){
@@ -125,7 +135,7 @@ mcp3008Spi::mcp3008Spi(){
  * overloaded constructor. let user set member variables to
  * and then call spiOpen()
  * ***********************************************/
-mcp3008Spi::mcp3008Spi(std::string devspi, unsigned char spiMode, unsigned int spiSpeed, unsigned char spibitsPerWord){
+mcp3008Spi::mcp3008Spi(const std::string& devspi, unsigned char spiMode, unsigned int spiSpeed, unsigned char spibitsPerWord){
     this->mode = spiMode ;
     this->bitsPerWord = spibitsPerWord;
     this->speed = spiSpeed;

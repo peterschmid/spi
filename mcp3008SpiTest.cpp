@@ -19,6 +19,8 @@
  *
  *
  * *********************************************************************/
+#include <unistd.h>
+#include <iostream>
 #include "mcp3008Spi.h"
 
 using namespace std;
