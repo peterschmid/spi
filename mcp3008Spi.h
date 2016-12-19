@@ -29,11 +29,25 @@
 
 class mcp3008Spi{
 
+	enum Channel
+	{
+	    CH0,
+	    CH1,
+	    CH2,
+		CH3,
+		CH4,
+		CH5,
+		CH6,
+		CH7
+	};
+
 public:
     mcp3008Spi();
     mcp3008Spi(const std::string& devspi, unsigned char spiMode, unsigned int spiSpeed, unsigned char spibitsPerWord);
     ~mcp3008Spi();
     int spiWriteRead( unsigned char *data, int length);
+    int readValue(Channel channel);
+    int readValueChannel0();
 
 private:
     unsigned char mode;

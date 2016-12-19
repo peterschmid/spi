@@ -103,7 +103,7 @@ int mcp3008Spi::spiWriteRead( unsigned char *data, int length){
     spi[i].speed_hz      = speed ;
     spi[i].bits_per_word = bitsPerWord ;
     spi[i].cs_change = 0;
-}
+  }
 
  retVal = ioctl (spifd, SPI_IOC_MESSAGE(length), &spi) ;
 
@@ -115,6 +115,26 @@ int mcp3008Spi::spiWriteRead( unsigned char *data, int length){
 return retVal;
 
 }
+
+int mcp3008Spi::readValue(Channel channel){
+	unsigned char data[3] = {0};
+
+	data[0] = 1;  //  first byte transmitted -> start bit
+	data[1] = 0b10000000 |( ((channel & 7) << 4)); // second byte transmitted -> (SGL/DIF = 1, D2=D1=D0=0)
+	data[2] = 0; // third byte transmitted....don't care
+
+	spiWriteRead(data, sizeof(data) );
+
+	int a2dVal = (data[1]<< 8) & 0b1100000000; //merge data[1] & data[2] to get result
+	a2dVal |=  (data[2] & 0xff);
+	return a2dVal;
+}
+
+int mcp3008Spi::readValueChannel0(){
+	return readValue(CH0);
+}
+
+
 
 /*************************************************
  * Default constructor. Set member variables to
