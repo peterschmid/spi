@@ -45,9 +45,19 @@ public:
     mcp3008Spi();
     mcp3008Spi(const std::string& devspi, unsigned char spiMode, unsigned int spiSpeed, unsigned char spibitsPerWord);
     ~mcp3008Spi();
+    /**
+     * Write and read function to SPI
+     */
     int spiWriteRead( unsigned char *data, int length);
+    /**
+     * Read value from selected channel
+     */
     int readValue(Channel channel);
+    /**
+     * Read value fix from channel 0
+     */
     int readValueChannel0();
+    int readValueChannel1();
 
 private:
     unsigned char mode;

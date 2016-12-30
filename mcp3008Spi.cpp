@@ -134,6 +134,9 @@ int mcp3008Spi::readValueChannel0(){
 	return readValue(CH0);
 }
 
+int mcp3008Spi::readValueChannel1(){
+	return readValue(CH1);
+}
 
 
 /*************************************************
