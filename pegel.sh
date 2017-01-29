@@ -13,3 +13,5 @@ fi
 PEGELSTAND_CM=$(echo $(./OutBinStub))
 #write pegel to csv file
 echo "$DATETIME;$PEGELSTAND_CM" >> $FILENAME
+
+./sendtoubidots.py $PEGELSTAND_CM
