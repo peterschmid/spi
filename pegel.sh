@@ -11,9 +11,13 @@ then
 fi
 
 #call SPI bin and store return code
-LEVEL_CM=$(echo $(./OutBinStub))
-#write level to csv file
-echo "$DATETIME;$LEVEL_CM" >> $FILENAME
+#LEVEL_CM=$(echo $(./OutBinStub))
+LEVEL_CM=$(echo $(./readSpiCh0mcp3008.bin))
+
+#write level to csv file if not empty
+if [ -n "$LEVEL_CM" ]; then
+    echo "$DATETIME;$LEVEL_CM" >> $FILENAME
+fi
 
 #send level value to ubidots skript
 ./sendtoubidots.py $LEVEL_CM
