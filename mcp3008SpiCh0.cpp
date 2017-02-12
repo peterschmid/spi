@@ -14,6 +14,10 @@ int main(void)
     auto digit = a2d.readValueChannel0();
     // change form digits to cm water level
     auto level = (digit - 185) * 0.367;
-    cout << level << endl;
+    auto intLevel = (int)(level+0.5);
+    if (intLevel<0) {
+        intLevel=0;
+    }
+    cout << intLevel << endl;
     return 0;
 }
