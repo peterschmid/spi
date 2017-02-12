@@ -11,14 +11,10 @@
 
 
 using namespace std;
-/**********************************************************
- * spiOpen() :function is called by the constructor.
- * It is responsible for opening the spidev device
- * "devspi" and then setting up the spidev interface.
- * private member variables are used to configure spidev.
- * They must be set appropriately by constructor before calling
- * this function.
- * *********************************************************/
+
+/**
+ * Open SPI device in read/write mode, sets bits per word and speed
+ */
 int mcp3008Spi::spiOpen(const std::string& devspi){
     int statusVal = -1;
     spifd = open(devspi.c_str(), O_RDWR);
@@ -65,11 +61,9 @@ int mcp3008Spi::spiOpen(const std::string& devspi){
     return statusVal;
 }
 
-/***********************************************************
- * spiClose(): Responsible for closing the spidev interface.
- * Called in destructor
- * *********************************************************/
-
+/**
+ * Close the SPI device
+ */
 int mcp3008Spi::spiClose(){
     int statusVal = -1;
     statusVal = close(spifd);
@@ -80,11 +74,10 @@ int mcp3008Spi::spiClose(){
     return statusVal;
 }
 
-/********************************************************************
- * This function writes data "data" of length "length" to the spidev
- * device. Data shifted in from the spidev device is saved back into
- * "data".
- * ******************************************************************/
+/**
+ * Write and read data to the SPI device
+ * Read data is saved back in given data buffer and replaces written data
+ */
 int mcp3008Spi::spiWriteRead( unsigned char *data, int length){
 
   struct spi_ioc_transfer spi[length];
@@ -116,11 +109,26 @@ return retVal;
 
 }
 
+/**
+ * Reads value of given channel
+ * SPI_MODE_0 (MODE 0) (defined in linux/spi/spidev.h), speed = 1MHz &
+ * bitsPerWord=8.
+ *
+ * i.e. transmit ->  byte1 = 0b00000001 (start bit)
+ *                   byte2 = 0b1XXX0000 (SGL/DIF = 1, channel=0-7)
+ *                   byte3 = 0b00000000 (Don't care)
+ *      receive  ->  byte1 = junk
+ *                   byte2 = junk + b8 + b9
+ *                   byte3 = b7 - b0
+ *
+ * after conversion must merge data[1] and data[2] to get final result
+ *
+ */
 int mcp3008Spi::readValue(Channel channel){
 	unsigned char data[3] = {0};
 
 	data[0] = 1;  //  first byte transmitted -> start bit
-	data[1] = 0b10000000 |( ((channel & 7) << 4)); // second byte transmitted -> (SGL/DIF = 1, D2=D1=D0=0)
+	data[1] = 0b10000000 |( ((channel & 7) << 4)); // second byte transmitted -> (SGL/DIF = 1, channel = 0-7)
 	data[2] = 0; // third byte transmitted....don't care
 
 	spiWriteRead(data, sizeof(data) );
@@ -130,19 +138,19 @@ int mcp3008Spi::readValue(Channel channel){
 	return a2dVal;
 }
 
+/**
+ * Read  value of channel 0
+ */
 int mcp3008Spi::readValueChannel0(){
 	return readValue(CH0);
 }
 
+/**
+ * Read value of channel 1
+ */
 int mcp3008Spi::readValueChannel1(){
 	return readValue(CH1);
 }
-
-
-/*************************************************
- * Default constructor. Set member variables to
- * default values and then call spiOpen()
- * ***********************************************/
 
 mcp3008Spi::mcp3008Spi(){
     mode = SPI_MODE_0 ;
@@ -154,10 +162,6 @@ mcp3008Spi::mcp3008Spi(){
 
     }
 
-/*************************************************
- * overloaded constructor. let user set member variables to
- * and then call spiOpen()
- * ***********************************************/
 mcp3008Spi::mcp3008Spi(const std::string& devspi, unsigned char spiMode, unsigned int spiSpeed, unsigned char spibitsPerWord){
     mode = spiMode ;
     bitsPerWord = spibitsPerWord;
@@ -168,9 +172,6 @@ mcp3008Spi::mcp3008Spi(const std::string& devspi, unsigned char spiMode, unsigne
 
 }
 
-/**********************************************
- * Destructor: calls spiClose()
- * ********************************************/
 mcp3008Spi::~mcp3008Spi(){
     spiClose();
 }

@@ -1,8 +1,10 @@
-/* rand example: guess the number */
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
 #include <iostream>
 
+/**
+ * Main program to generate random numbers between 0 and 1023
+ */
 int main ()
 {
   auto number = 0;
