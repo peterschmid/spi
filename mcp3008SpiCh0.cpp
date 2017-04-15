@@ -13,7 +13,7 @@ int main(void)
 
     auto digit = a2d.readValueChannel0();
     // change form digits to cm water level
-    auto level = (digit - 185) * 0.367;
+    auto level = digit*0.3478-63.702;
     auto intLevel = (int)(level+0.5);
     if (intLevel<0) {
         intLevel=0;
